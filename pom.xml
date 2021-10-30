@@ -86,7 +86,7 @@
                             <goal>single</goal>
                         </goals>
                         <configuration>
-                            <archive>b
+                            <archive>
                                 <manifest>
                                     <mainClass>
                                         com.udacity.webcrawler.main.WebCrawlerMain
