@@ -1,8 +1,8 @@
 package com.udacity.webcrawler;
 
 import com.udacity.webcrawler.parser.PageParser;
+import com.udacity.webcrawler.parser.PageParserFactory;
 
-import javax.inject.Inject;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
@@ -17,15 +17,15 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private final List<String> startingUrls;
     private final int maxDepth;
     private final Clock clock;
-    @Inject
-    private com.udacity.webcrawler.parser.PageParserFactory parserFactory;
+    private PageParserFactory parserFactory;
 
-    public CrawlerRecursiveAction(Instant deadline, List<String> startingUrls, int maxDepth, Clock clock, List<Pattern> ignoredUrls) {
+    public CrawlerRecursiveAction(Instant deadline, List<String> startingUrls, int maxDepth, Clock clock, List<Pattern> ignoredUrls, PageParserFactory parserFactory) {
         this.deadline = deadline;
         this.startingUrls = startingUrls;
         this.maxDepth = maxDepth;
         this.clock = clock;
         this.ignoredUrls = ignoredUrls;
+        this.parserFactory = parserFactory;
     }
 
     @Override
@@ -37,6 +37,9 @@ public class CrawlerRecursiveAction extends RecursiveAction {
             }
         } else {
             if (maxDepth == 0 || clock.instant().isAfter(deadline)) {
+                return;
+            }
+            if (startingUrls.isEmpty()) {
                 return;
             }
             String url = startingUrls.get(0);
@@ -64,9 +67,9 @@ public class CrawlerRecursiveAction extends RecursiveAction {
         List<CrawlerRecursiveAction> subtasks = new ArrayList<>();
         int size = this.startingUrls.size();
         CrawlerRecursiveAction subtask1 = new CrawlerRecursiveAction(this.deadline, new ArrayList<>(
-                this.startingUrls.subList(0, size / 2)), this.maxDepth - 1, clock, ignoredUrls);
+                this.startingUrls.subList(0, size / 2)), this.maxDepth - 1, clock, ignoredUrls, parserFactory);
         CrawlerRecursiveAction subtask2 = new CrawlerRecursiveAction(this.deadline, new ArrayList<>(
-                this.startingUrls.subList(size / 2, size)), this.maxDepth - 1, clock, ignoredUrls);
+                this.startingUrls.subList(size / 2, size)), this.maxDepth - 1, clock, ignoredUrls, parserFactory);
         subtasks.add(subtask1);
         subtasks.add(subtask2);
         return subtasks;

@@ -1,6 +1,7 @@
 package com.udacity.webcrawler;
 
 import com.udacity.webcrawler.json.CrawlResult;
+import com.udacity.webcrawler.parser.PageParserFactory;
 
 import javax.inject.Inject;
 import java.time.Clock;
@@ -18,6 +19,7 @@ import java.util.regex.Pattern;
  */
 final class ParallelWebCrawler implements WebCrawler {
     private final Clock clock;
+    private final PageParserFactory parserFactory;
     private final Duration timeout;
     private final int popularWordCount;
     private final ForkJoinPool pool;
@@ -27,6 +29,7 @@ final class ParallelWebCrawler implements WebCrawler {
     @Inject
     ParallelWebCrawler(
             Clock clock,
+            PageParserFactory parserFactory,
             @Timeout Duration timeout,
             @PopularWordCount int popularWordCount,
             @TargetParallelism int threadCount,
@@ -38,12 +41,13 @@ final class ParallelWebCrawler implements WebCrawler {
         this.pool = new ForkJoinPool(Math.min(threadCount, getMaxParallelism()));
         this.maxDepth = maxDepth;
         this.ignoredUrls = ignoredUrls;
+        this.parserFactory = parserFactory;
     }
 
     @Override
     public CrawlResult crawl(List<String> startingUrls) {
         Instant deadline = clock.instant().plus(timeout);
-        CrawlerRecursiveAction crawlerRecursiveAction = new CrawlerRecursiveAction(deadline, startingUrls, maxDepth, clock, ignoredUrls);
+        CrawlerRecursiveAction crawlerRecursiveAction = new CrawlerRecursiveAction(deadline, startingUrls, maxDepth, clock, ignoredUrls, parserFactory);
         pool.invoke(crawlerRecursiveAction);
         Map<String, Integer> counts = crawlerRecursiveAction.getCounts();
         Set<String> visitedUrls = crawlerRecursiveAction.getVisitedUrls();
