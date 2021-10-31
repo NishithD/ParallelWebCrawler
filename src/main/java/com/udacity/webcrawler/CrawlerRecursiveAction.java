@@ -17,15 +17,52 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private final List<String> startingUrls;
     private final int maxDepth;
     private final Clock clock;
-    private PageParserFactory parserFactory;
+    private final PageParserFactory parserFactory;
 
-    public CrawlerRecursiveAction(Instant deadline, List<String> startingUrls, int maxDepth, Clock clock, List<Pattern> ignoredUrls, PageParserFactory parserFactory) {
+    private CrawlerRecursiveAction(Instant deadline,
+                                   List<String> startingUrls,
+                                   int maxDepth,
+                                   Clock clock,
+                                   List<Pattern> ignoredUrls,
+                                   PageParserFactory parserFactory) {
         this.deadline = deadline;
         this.startingUrls = startingUrls;
         this.maxDepth = maxDepth;
         this.clock = clock;
         this.ignoredUrls = ignoredUrls;
         this.parserFactory = parserFactory;
+    }
+
+    public Instant getDeadline() {
+        return deadline;
+    }
+
+    public List<String> getStartingUrls() {
+        return startingUrls;
+    }
+
+    public int getMaxDepth() {
+        return maxDepth;
+    }
+
+    public Clock getClock() {
+        return clock;
+    }
+
+    public List<Pattern> getIgnoredUrls() {
+        return ignoredUrls;
+    }
+
+    public PageParserFactory getParserFactory() {
+        return parserFactory;
+    }
+
+    public Set<String> getVisitedUrls() {
+        return visitedUrls;
+    }
+
+    public Map<String, Integer> getCounts() {
+        return counts;
     }
 
     @Override
@@ -51,14 +88,18 @@ public class CrawlerRecursiveAction extends RecursiveAction {
             if (visitedUrls.contains(url)) {
                 return;
             }
-            visitedUrls.add(url);
-            PageParser.Result result = parserFactory.get(url).parse();
-            for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
-                if (counts.containsKey(e.getKey())) {
-                    counts.put(e.getKey(), e.getValue() + counts.get(e.getKey()));
-                } else {
-                    counts.put(e.getKey(), e.getValue());
+            synchronized (visitedUrls) {
+                if (visitedUrls.contains(url)) {
+                    return;
                 }
+                visitedUrls.add(url);
+            }
+            PageParser.Result result = parserFactory.get(url).parse();
+            synchronized (counts) {
+                for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
+                    counts.put(e.getKey(), counts.containsKey(e.getKey()) ? counts.get(e.getKey()) + e.getValue() : e.getValue());
+                }
+
             }
         }
     }
@@ -66,20 +107,67 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private List<CrawlerRecursiveAction> createSubtasks() {
         List<CrawlerRecursiveAction> subtasks = new ArrayList<>();
         int size = this.startingUrls.size();
-        CrawlerRecursiveAction subtask1 = new CrawlerRecursiveAction(this.deadline, new ArrayList<>(
-                this.startingUrls.subList(0, size / 2)), this.maxDepth - 1, clock, ignoredUrls, parserFactory);
-        CrawlerRecursiveAction subtask2 = new CrawlerRecursiveAction(this.deadline, new ArrayList<>(
-                this.startingUrls.subList(size / 2, size)), this.maxDepth - 1, clock, ignoredUrls, parserFactory);
+        CrawlerRecursiveAction subtask1 = new CrawlerRecursiveAction.Builder().
+                setDeadline(deadline).
+                setStartingUrls(new ArrayList<>(this.startingUrls.subList(0, size / 2))).
+                setMaxDepth(maxDepth - 1).
+                setClock(clock).
+                setIgnoredUrls(ignoredUrls).
+                setParserFactory(parserFactory).
+                build();
+        CrawlerRecursiveAction subtask2 = new CrawlerRecursiveAction.Builder().
+                setDeadline(deadline).
+                setStartingUrls(new ArrayList<>(this.startingUrls.subList(size / 2, size))).
+                setMaxDepth(maxDepth - 1).
+                setClock(clock).
+                setIgnoredUrls(ignoredUrls).
+                setParserFactory(parserFactory).
+                build();
         subtasks.add(subtask1);
         subtasks.add(subtask2);
         return subtasks;
     }
 
-    public Set<String> getVisitedUrls() {
-        return visitedUrls;
-    }
+    public static final class Builder {
+        private List<Pattern> ignoredUrls;
+        private Instant deadline;
+        private List<String> startingUrls;
+        private int maxDepth;
+        private Clock clock;
+        private PageParserFactory parserFactory;
 
-    public Map<String, Integer> getCounts() {
-        return counts;
+        public Builder setIgnoredUrls(List<Pattern> ignoredUrls) {
+            this.ignoredUrls = ignoredUrls;
+            return this;
+        }
+
+        public Builder setDeadline(Instant deadline) {
+            this.deadline = deadline;
+            return this;
+        }
+
+        public Builder setStartingUrls(List<String> startingUrls) {
+            this.startingUrls = startingUrls;
+            return this;
+        }
+
+        public Builder setClock(Clock clock) {
+            this.clock = clock;
+            return this;
+        }
+
+        public Builder setMaxDepth(int maxDepth) {
+            this.maxDepth = maxDepth;
+            return this;
+        }
+
+        public Builder setParserFactory(PageParserFactory parserFactory) {
+            this.parserFactory = parserFactory;
+            return this;
+        }
+
+        public CrawlerRecursiveAction build() {
+            return new CrawlerRecursiveAction(deadline, startingUrls, maxDepth, clock, ignoredUrls, parserFactory);
+        }
     }
 }
