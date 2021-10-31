@@ -134,7 +134,9 @@ public class CrawlerRecursiveAction extends RecursiveAction {
             PageParser.Result result = parserFactory.get(url).parse();
             synchronized (counts) {
                 for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
-                    counts.put(e.getKey(), counts.containsKey(e.getKey()) ? counts.get(e.getKey()) + e.getValue() : e.getValue());
+                    counts.put(e.getKey(), counts.containsKey(e.getKey())
+                            ? counts.get(e.getKey()) + e.getValue()
+                            : e.getValue());
                 }
 
             }
@@ -144,22 +146,24 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private List<CrawlerRecursiveAction> createSubtasks() {
         List<CrawlerRecursiveAction> subtasks = new ArrayList<>();
         int size = this.startingUrls.size();
-        CrawlerRecursiveAction subtask1 = new CrawlerRecursiveAction.Builder().
-                setDeadline(deadline).
-                setStartingUrls(new ArrayList<>(this.startingUrls.subList(0, size / 2))).
-                setMaxDepth(maxDepth - 1).
-                setClock(clock).
-                setIgnoredUrls(ignoredUrls).
-                setParserFactory(parserFactory).
-                build();
-        CrawlerRecursiveAction subtask2 = new CrawlerRecursiveAction.Builder().
-                setDeadline(deadline).
-                setStartingUrls(new ArrayList<>(this.startingUrls.subList(size / 2, size))).
-                setMaxDepth(maxDepth - 1).
-                setClock(clock).
-                setIgnoredUrls(ignoredUrls).
-                setParserFactory(parserFactory).
-                build();
+        CrawlerRecursiveAction subtask1 = new CrawlerRecursiveAction
+                .Builder()
+                .setDeadline(deadline)
+                .setStartingUrls(new ArrayList<>(this.startingUrls.subList(0, size / 2)))
+                .setMaxDepth(maxDepth - 1)
+                .setClock(clock)
+                .setIgnoredUrls(ignoredUrls)
+                .setParserFactory(parserFactory)
+                .build();
+        CrawlerRecursiveAction subtask2 = new CrawlerRecursiveAction
+                .Builder()
+                .setDeadline(deadline)
+                .setStartingUrls(new ArrayList<>(this.startingUrls.subList(size / 2, size)))
+                .setMaxDepth(maxDepth - 1)
+                .setClock(clock)
+                .setIgnoredUrls(ignoredUrls)
+                .setParserFactory(parserFactory)
+                .build();
         subtasks.add(subtask1);
         subtasks.add(subtask2);
         return subtasks;

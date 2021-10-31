@@ -60,10 +60,11 @@ final class WordCounts {
      */
     static Map<String, Integer> sort(Map<String, Integer> wordCounts, int popularWordCount) {
 
-        return wordCounts.entrySet().stream().
-                sorted(new WordCountComparator()).
-                limit(Math.min(popularWordCount, wordCounts.size())).
-                collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (u, v) -> u,
+        return wordCounts.entrySet()
+                .stream()
+                .sorted(new WordCountComparator())
+                .limit(Math.min(popularWordCount, wordCounts.size()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (u, v) -> u,
                         LinkedHashMap::new));
     }
 
