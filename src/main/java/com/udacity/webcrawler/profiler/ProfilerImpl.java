@@ -39,6 +39,8 @@ package com.udacity.webcrawler.profiler;
 
 import javax.inject.Inject;
 import java.io.*;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.nio.file.Path;
 import java.time.Clock;
@@ -52,8 +54,8 @@ import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
  */
 final class ProfilerImpl implements Profiler {
 
-    private final Clock clock;
     private final ProfilingState state = new ProfilingState();
+    private final Clock clock;
     private final ZonedDateTime startTime;
 
     @Inject
@@ -66,9 +68,21 @@ final class ProfilerImpl implements Profiler {
     @SuppressWarnings("unchecked")
     public <T> T wrap(Class<T> klass, T delegate) {
         Objects.requireNonNull(klass);
-        return (T) Proxy.newProxyInstance(klass.getClassLoader(),
-                new Class[]{delegate.getClass()},
-                new ProfilingMethodInterceptor(clock));
+        Method[] methods = klass.getDeclaredMethods();
+        boolean pass = false;
+        for (Method method : methods) {
+            Annotation[] annotations = method.getAnnotations();
+            for (Annotation a : annotations) {
+                if (a instanceof Profiled) {
+                    pass = true;
+                    break;
+                }
+            }
+        }
+        if (!pass) throw new IllegalArgumentException();
+        return (T) Proxy.newProxyInstance(delegate.getClass().getClassLoader(),
+                new Class<?>[]{klass},
+                new ProfilingMethodInterceptor(clock, delegate));
     }
 
     @Override
