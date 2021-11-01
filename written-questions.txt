@@ -18,12 +18,13 @@ Q1. Run the web crawler using the configurations located at src/main/config/writ
     Run at Mon, 1 Nov 2021 15:57:47 GMT
     com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 271ms
     com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 255ms
-
     2. Parallel crawler:
     {"wordCounts":{"data":555,"udacity":247,"program":199,"with":186,"nanodegree":162},"urlsVisited":13}
     Run at Mon, 1 Nov 2021 16:00:05 GMT
     com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 568ms
     com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 5s 739ms
+    I think because of parallelism, the parallel crawler can access to more urls at the same time and call parse method
+    on the webpages, so in total the parser of parallel crawler takes more time to execute.
 
 
 Q2. Your manager ran your crawler on her old personal computer, using the configurations from Q1, and she notices that
@@ -31,28 +32,55 @@ Q2. Your manager ran your crawler on her old personal computer, using the config
 
     (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
         (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
+
         ANSWER:
         After having set the parallelism to 1 in written_question_1b.json, I got the following result:
         {"wordCounts":{"learning":64,"data":53,"machine":43,"udacity":42,"with":41},"urlsVisited":2}
         Run at Mon, 1 Nov 2021 16:03:09 GMT
         com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 359ms
         com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 330ms
+        I think the main reason is that when I run a multithreading program on a PC without parallelism,
+        the createSubtasks in class CrawlerRecursiveAction method still adds subtasks and submits it to execute which
+        leads to more overhead.
 
     (b) Suggest one scenario in which the parallel web crawler will almost certainly perform better than the sequential
         crawler. Why will it perform better?
+
+        ANSWER:
+        Running the crawlers on a multi-core PC. Because in theory the multi-core PC can run as many threads as the number
+        of core in CPU, which leads to a better performance.
 
 
 Q3. Analyze your method profiler through the lens of Aspect Oriented Programming, by answering the following questions:
 
     (a) What cross-cutting concern is being addressed by the com.udacity.webcrawler.profiler.Profiler class?
 
+    ANSWER:
+    The profiler deals with profiling job, in other word, to time how long a method call takes to execute.
+
     (b) What are the join points of the Profiler in the web crawler program?
 
+    ANSWER:
+    com.udacity.webcrawler.WebCrawler.crawl and com.udacity.webcrawler.parser.PageParser.parse.
 
 Q4. Identify three (3) different design patterns used in this project, and explain which interfaces, classes, and/or
     libraries use or implement those design patterns.
 
     For each pattern, name one thing about the pattern that you LIKED, and one thing you DISLIKED. If you did not like
     anything, you can name two things you disliked.
+
+    ANSWER:
+    1. Abstract factory pattern: PageParserFactoryImpl implements the PageParserFactory interface.
+        One thing I like: the construction details are hidden and parser is easy to use.
+        One thing I dislike: new abstract class is added so another layer.
+    2. Builder pattern: CrawlerConfiguration use this pattern to initialize new instance.
+        One thing I like: I can construct objects step-by-step like configuring the crawler.
+        One thing I dislike: code is complexer than direct implementation because you have to implement a builder class.
+    3. Dependency injection: this is mainly used in test together with Google Guice library. For example, in WebCrawlerModule,
+    the web crawler is configured and injected into WebcrawlerTest. Similarly, the ProfilerModule provides a Profiler,
+    and ParserModule provides a PageParserFactory.
+        One thing I like: flexibility and isolating responsibility, for example I can fake a clock and do not need to
+         use the system clock or hard-coded in test.
+        One thing I dislike: initializing and providing dependencies are cumbersome and have to use additional library.
 
 

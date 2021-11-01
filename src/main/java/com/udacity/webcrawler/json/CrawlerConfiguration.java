@@ -308,6 +308,7 @@ public final class CrawlerConfiguration {
         }
 
         /**
+         * Build
          * Sets the maximum amount of time allowed for the crawl, specified in seconds.
          *
          * <p>See {@link #getTimeout()}.

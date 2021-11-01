@@ -10,3 +10,15 @@ Run at Mon, 1 Nov 2021 16:03:09 GMT
 com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 359ms
 com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 330ms
 
+Run at Mon, 1 Nov 2021 16:20:21 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 11s 446ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 1s 707ms
+
+Run at Mon, 1 Nov 2021 16:21:11 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 699ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 4s 582ms
+
+Run at Mon, 1 Nov 2021 16:21:26 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 9s 681ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 1s 306ms
+
