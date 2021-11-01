@@ -30,7 +30,7 @@ mvn package
 java -cp target/udacity-webcrawler-1.0.jar com.udacity.webcrawler.main.WebCrawlerMain src/main/config/example_config.json
 ```
 
-![image-20211101192132950](README.assets/image-20211101192132950.png)
+![image-20211101193239764](README.assets/example.png)
 
 ## Configuration
 
