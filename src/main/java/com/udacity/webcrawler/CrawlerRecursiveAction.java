@@ -51,10 +51,10 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private static final Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
     private final List<Pattern> ignoredUrls;
     private final Instant deadline;
-    private final List<String> startingUrls;
-    private final int maxDepth;
     private final Clock clock;
     private final PageParserFactory parserFactory;
+    private List<String> startingUrls;
+    private int maxDepth;
 
     private CrawlerRecursiveAction(Instant deadline,
                                    List<String> startingUrls,
@@ -104,68 +104,79 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
     @Override
     protected void compute() {
-        if (this.startingUrls.size() > 1) {
-            List<CrawlerRecursiveAction> subtasks = new ArrayList<>(createSubtasks());
-            for (RecursiveAction subtask : subtasks) {
-                subtask.fork();
-            }
-        } else {
-            if (maxDepth == 0 || clock.instant().isAfter(deadline)) {
-                return;
-            }
-            if (startingUrls.isEmpty()) {
-                return;
-            }
-            String url = startingUrls.get(0);
-            for (Pattern pattern : ignoredUrls) {
-                if (pattern.matcher(url).matches()) {
+        while (!startingUrls.isEmpty()) {
+            if (isMaxDepthReached() || isTimeOut() || isStartEmpty()) return;
+            if (startingUrls.size() > 1) {
+                List<CrawlerRecursiveAction> subtasks = new ArrayList<>(createSubtasks());
+                for (RecursiveAction subtask : subtasks) {
+                    subtask.fork();
+                }
+            } else {
+                String url = startingUrls.get(0);
+                if (isUrlIgnored(url)) return;
+                if (isVisited(url)) {
                     return;
                 }
-            }
-            if (visitedUrls.contains(url)) {
-                return;
-            }
-            synchronized (visitedUrls) {
-                if (visitedUrls.contains(url)) {
-                    return;
+                synchronized (visitedUrls) {
+                    if (isVisited(url)) {
+                        return;
+                    }
+                    visitedUrls.add(url);
                 }
-                visitedUrls.add(url);
-            }
-            PageParser.Result result = parserFactory.get(url).parse();
-            synchronized (counts) {
-                for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
-                    counts.put(e.getKey(), counts.containsKey(e.getKey())
-                            ? counts.get(e.getKey()) + e.getValue()
-                            : e.getValue());
-                }
+                PageParser.Result result = parserFactory.get(url).parse();
+                synchronized (counts) {
+                    for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
+                        counts.put(e.getKey(), counts.containsKey(e.getKey())
+                                ? counts.get(e.getKey()) + e.getValue()
+                                : e.getValue());
+                    }
 
+                }
+                startingUrls = result.getLinks();
+                maxDepth -= 1;
             }
         }
     }
 
+    private boolean isUrlIgnored(String url) {
+        for (Pattern pattern : ignoredUrls) {
+            if (pattern.matcher(url).matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean isVisited(String url) {
+        return visitedUrls.contains(url);
+    }
+
+    private boolean isStartEmpty() {
+        return startingUrls.isEmpty();
+    }
+
+    private boolean isTimeOut() {
+        return clock.instant().isAfter(deadline);
+    }
+
+    private boolean isMaxDepthReached() {
+        return maxDepth == 0;
+    }
+
     private List<CrawlerRecursiveAction> createSubtasks() {
         List<CrawlerRecursiveAction> subtasks = new ArrayList<>();
-        int size = this.startingUrls.size();
-        CrawlerRecursiveAction subtask1 = new CrawlerRecursiveAction
-                .Builder()
-                .setDeadline(deadline)
-                .setStartingUrls(new ArrayList<>(this.startingUrls.subList(0, size / 2)))
-                .setMaxDepth(maxDepth - 1)
-                .setClock(clock)
-                .setIgnoredUrls(ignoredUrls)
-                .setParserFactory(parserFactory)
-                .build();
-        CrawlerRecursiveAction subtask2 = new CrawlerRecursiveAction
-                .Builder()
-                .setDeadline(deadline)
-                .setStartingUrls(new ArrayList<>(this.startingUrls.subList(size / 2, size)))
-                .setMaxDepth(maxDepth - 1)
-                .setClock(clock)
-                .setIgnoredUrls(ignoredUrls)
-                .setParserFactory(parserFactory)
-                .build();
-        subtasks.add(subtask1);
-        subtasks.add(subtask2);
+        int size = startingUrls.size();
+        for (int i = 0; i < size; i++) {
+            subtasks.add(new CrawlerRecursiveAction
+                    .Builder()
+                    .setDeadline(deadline)
+                    .setStartingUrls(startingUrls.subList(i, i + 1))
+                    .setMaxDepth(maxDepth - 1)
+                    .setClock(clock)
+                    .setIgnoredUrls(ignoredUrls)
+                    .setParserFactory(parserFactory)
+                    .build());
+        }
         return subtasks;
     }
 
