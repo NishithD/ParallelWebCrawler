@@ -43,8 +43,8 @@ package com.udacity.webcrawler.parser;
  */
 public interface PageParserFactory {
 
-  /**
-   * Returns a {@link PageParser} that parses the given {@link url}.
-   */
-  PageParser get(String url);
+    /**
+     * Returns a {@link PageParser} that parses the given {@link url}.
+     */
+    PageParser get(String url);
 }

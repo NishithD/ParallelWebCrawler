@@ -49,9 +49,9 @@ import java.time.Clock;
  * <p>Requires a {@link java.time.Clock} to already be bound.
  */
 public final class ProfilerModule extends AbstractModule {
-  @Provides
-  @Singleton
-  Profiler provideProfiler(Clock clock) {
-    return new ProfilerImpl(clock);
-  }
+    @Provides
+    @Singleton
+    Profiler provideProfiler(Clock clock) {
+        return new ProfilerImpl(clock);
+    }
 }

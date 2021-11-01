@@ -51,7 +51,7 @@ import java.util.Objects;
 final class ProfilingMethodInterceptor implements InvocationHandler {
     private final Clock clock;
     private final Object delegate;
-    private ProfilingState state;
+    private final ProfilingState state;
 
 
     ProfilingMethodInterceptor(Clock clock, Object delegate, ProfilingState state) {

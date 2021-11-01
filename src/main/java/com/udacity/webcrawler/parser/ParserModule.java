@@ -50,52 +50,53 @@ import java.util.regex.Pattern;
  * create page parsers.
  */
 public final class ParserModule extends AbstractModule {
-  private final Duration timeout;
-  private final List<Pattern> ignoredWords;
-
-  /**
-   * Creates a {@link ParserModule} from the given timeout and ignored word patterns.
-   */
-  private ParserModule(Duration timeout, List<Pattern> ignoredWords) {
-    this.timeout = timeout;
-    this.ignoredWords = ignoredWords;
-  }
-
-  @Override
-  protected void configure() {
-    bind(Key.get(Duration.class, ParseDeadline.class)).toInstance(timeout);
-    bind(new Key<List<Pattern>>(IgnoredWords.class) {}).toInstance(ignoredWords);
-    bind(PageParserFactory.class).to(PageParserFactoryImpl.class);
-  }
-
-  /**
-   * A builder class for {@link ParserModule}.
-   */
-  public static final class Builder {
-    private Duration timeout;
-    private List<Pattern> ignoredWords;
+    private final Duration timeout;
+    private final List<Pattern> ignoredWords;
 
     /**
-     * Sets the timeout that will be used by the page parser.
+     * Creates a {@link ParserModule} from the given timeout and ignored word patterns.
      */
-    public Builder setTimeout(Duration timeout) {
-      this.timeout = Objects.requireNonNull(timeout);
-      return this;
+    private ParserModule(Duration timeout, List<Pattern> ignoredWords) {
+        this.timeout = timeout;
+        this.ignoredWords = ignoredWords;
+    }
+
+    @Override
+    protected void configure() {
+        bind(Key.get(Duration.class, ParseDeadline.class)).toInstance(timeout);
+        bind(new Key<List<Pattern>>(IgnoredWords.class) {
+        }).toInstance(ignoredWords);
+        bind(PageParserFactory.class).to(PageParserFactoryImpl.class);
     }
 
     /**
-     * Sets the ignored word patterns that will be used by the page parser.
+     * A builder class for {@link ParserModule}.
      */
-    public Builder setIgnoredWords(List<Pattern> ignoredWords) {
-      this.ignoredWords = Objects.requireNonNull(ignoredWords);
-      return this;
-    }
+    public static final class Builder {
+        private Duration timeout;
+        private List<Pattern> ignoredWords;
 
-    /**
-     * Builds a {@link ParserModule} from this {@link Builder}.
-     */
-    public ParserModule build() {
-      return new ParserModule(timeout, ignoredWords);
+        /**
+         * Sets the timeout that will be used by the page parser.
+         */
+        public Builder setTimeout(Duration timeout) {
+            this.timeout = Objects.requireNonNull(timeout);
+            return this;
+        }
+
+        /**
+         * Sets the ignored word patterns that will be used by the page parser.
+         */
+        public Builder setIgnoredWords(List<Pattern> ignoredWords) {
+            this.ignoredWords = Objects.requireNonNull(ignoredWords);
+            return this;
+        }
+
+        /**
+         * Builds a {@link ParserModule} from this {@link Builder}.
+         */
+        public ParserModule build() {
+            return new ParserModule(timeout, ignoredWords);
+        }
     }
-  }
 }
