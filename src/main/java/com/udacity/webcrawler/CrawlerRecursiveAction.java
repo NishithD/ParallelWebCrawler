@@ -43,6 +43,7 @@ import com.udacity.webcrawler.parser.PageParserFactory;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.ForkJoinTask;
 import java.util.concurrent.RecursiveAction;
 import java.util.regex.Pattern;
 
@@ -53,7 +54,8 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private final Instant deadline;
     private final Clock clock;
     private final PageParserFactory parserFactory;
-    private List<String> startingUrls;
+    private final List<String> startingUrls;
+    private List<String> toCrawlUrls;
     private int maxDepth;
 
     private CrawlerRecursiveAction(Instant deadline,
@@ -64,6 +66,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
                                    PageParserFactory parserFactory) {
         this.deadline = deadline;
         this.startingUrls = startingUrls;
+        this.toCrawlUrls = startingUrls;
         this.maxDepth = maxDepth;
         this.clock = clock;
         this.ignoredUrls = ignoredUrls;
@@ -104,15 +107,12 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
     @Override
     protected void compute() {
-        while (!startingUrls.isEmpty()) {
+        while (!toCrawlUrls.isEmpty()) {
             if (isMaxDepthReached() || isTimeOut() || isStartEmpty()) return;
-            if (startingUrls.size() > 1) {
-                List<CrawlerRecursiveAction> subtasks = new ArrayList<>(createSubtasks());
-                for (RecursiveAction subtask : subtasks) {
-                    subtask.fork();
-                }
+            if (toCrawlUrls.size() > 1) {
+                ForkJoinTask.invokeAll(createSubtasks());
             } else {
-                String url = startingUrls.get(0);
+                String url = toCrawlUrls.get(0);
                 if (isUrlIgnored(url)) return;
                 if (isVisited(url)) {
                     return;
@@ -132,7 +132,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
                     }
 
                 }
-                startingUrls = result.getLinks();
+                toCrawlUrls = result.getLinks();
                 maxDepth -= 1;
             }
         }
@@ -165,18 +165,19 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
     private List<CrawlerRecursiveAction> createSubtasks() {
         List<CrawlerRecursiveAction> subtasks = new ArrayList<>();
-        int size = startingUrls.size();
-        for (int i = 0; i < size; i++) {
+        int size = toCrawlUrls.size();
+        for (int i = 1; i < size; i++) {
             subtasks.add(new CrawlerRecursiveAction
                     .Builder()
                     .setDeadline(deadline)
-                    .setStartingUrls(startingUrls.subList(i, i + 1))
+                    .setStartingUrls(toCrawlUrls.subList(i, i + 1))
                     .setMaxDepth(maxDepth - 1)
                     .setClock(clock)
                     .setIgnoredUrls(ignoredUrls)
                     .setParserFactory(parserFactory)
                     .build());
         }
+        toCrawlUrls = toCrawlUrls.subList(0, 1);
         return subtasks;
     }
 
