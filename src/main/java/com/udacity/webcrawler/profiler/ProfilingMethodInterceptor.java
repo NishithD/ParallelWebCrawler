@@ -51,12 +51,13 @@ import java.util.Objects;
 final class ProfilingMethodInterceptor implements InvocationHandler {
     private final Clock clock;
     private final Object delegate;
-    ProfilingState state = new ProfilingState();
+    private ProfilingState state;
 
 
-    ProfilingMethodInterceptor(Clock clock, Object delegate) {
+    ProfilingMethodInterceptor(Clock clock, Object delegate, ProfilingState state) {
         this.clock = Objects.requireNonNull(clock);
         this.delegate = delegate;
+        this.state = state;
     }
 
     @Override
@@ -66,11 +67,14 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
         try {
             result = method.invoke(delegate, args);
         } catch (Exception e) {
+            Instant endTime = clock.instant();
+            Duration duration = Duration.between(startTime, endTime);
+            state.record(delegate.getClass(), method, duration);
             throw e.getCause();
         }
         Instant endTime = clock.instant();
         Duration duration = Duration.between(startTime, endTime);
-        state.record(proxy.getClass(), method, duration);
+        state.record(delegate.getClass(), method, duration);
         return result;
     }
 }

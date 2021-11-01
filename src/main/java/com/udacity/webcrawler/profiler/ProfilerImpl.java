@@ -54,7 +54,7 @@ import static java.time.format.DateTimeFormatter.RFC_1123_DATE_TIME;
  */
 final class ProfilerImpl implements Profiler {
 
-    private final ProfilingState state = new ProfilingState();
+    private static final ProfilingState state = new ProfilingState();
     private final Clock clock;
     private final ZonedDateTime startTime;
 
@@ -82,7 +82,7 @@ final class ProfilerImpl implements Profiler {
         if (!pass) throw new IllegalArgumentException();
         return (T) Proxy.newProxyInstance(delegate.getClass().getClassLoader(),
                 new Class<?>[]{klass},
-                new ProfilingMethodInterceptor(clock, delegate));
+                new ProfilingMethodInterceptor(clock, delegate, state));
     }
 
     @Override
