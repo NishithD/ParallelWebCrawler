@@ -22,3 +22,11 @@ Run at Mon, 1 Nov 2021 16:21:26 GMT
 com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 9s 681ms
 com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 1s 306ms
 
+Run at Mon, 1 Nov 2021 18:18:35 GMT
+com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 365ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 350ms
+
+Run at Mon, 1 Nov 2021 18:19:46 GMT
+com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 572ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 559ms
+
