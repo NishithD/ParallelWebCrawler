@@ -11,12 +11,32 @@ Q1. Run the web crawler using the configurations located at src/main/config/writ
 
     Why did the parser take more time when run with ParallelWebCrawler?
 
+    ANSWER:
+    The result I got from both configurations:
+    1. Sequential crawler:
+    {"wordCounts":{"udacity":69,"learning":67,"data":60,"with":46,"machine":44},"urlsVisited":3}
+    Run at Mon, 1 Nov 2021 15:57:47 GMT
+    com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 271ms
+    com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 255ms
+
+    2. Parallel crawler:
+    {"wordCounts":{"data":555,"udacity":247,"program":199,"with":186,"nanodegree":162},"urlsVisited":13}
+    Run at Mon, 1 Nov 2021 16:00:05 GMT
+    com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 568ms
+    com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 5s 739ms
+
 
 Q2. Your manager ran your crawler on her old personal computer, using the configurations from Q1, and she notices that
     the sequential crawler actually outperforms the parallel crawler. She would like to know why.
 
     (a) Suggest one reason why the sequential web crawler was able to read more web pages than the parallel crawler.
         (Hint: Try setting "parallelism" to 1 in the JSON configs to simulate your manager's computer.)
+        ANSWER:
+        After having set the parallelism to 1 in written_question_1b.json, I got the following result:
+        {"wordCounts":{"learning":64,"data":53,"machine":43,"udacity":42,"with":41},"urlsVisited":2}
+        Run at Mon, 1 Nov 2021 16:03:09 GMT
+        com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 359ms
+        com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 330ms
 
     (b) Suggest one scenario in which the parallel web crawler will almost certainly perform better than the sequential
         crawler. Why will it perform better?
