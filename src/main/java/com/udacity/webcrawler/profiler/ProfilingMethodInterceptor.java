@@ -64,7 +64,7 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Object result = null;
+        Object result;
         if (isMethodProfiled(method)) {
             Instant startTime = clock.instant();
             try {
@@ -77,6 +77,14 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
                 Instant endTime = clock.instant();
                 Duration duration = Duration.between(startTime, endTime);
                 state.record(delegate.getClass(), method, duration);
+            }
+        } else {
+            try {
+                result = method.invoke(delegate, args);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
             }
         }
         return result;
