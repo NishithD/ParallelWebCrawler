@@ -1,10 +1,17 @@
 {
-  "startPages": ["https://www.udacity.com/"],
-  "ignoredUrls": ["https://blog.udacity.com/.*"],
-  "ignoredWords": ["^.{1,3}$"],
+  "startPages": [
+    "https://www.udacity.com/"
+  ],
+  "ignoredUrls": [
+    "https://blog.udacity.com/.*"
+  ],
+  "implementationOverride": "com.udacity.webcrawler.ParallelWebCrawler",
+  "ignoredWords": [
+    "^.{1,3}$"
+  ],
   "parallelism": 4,
   "maxDepth": 10,
-  "timeoutSeconds": 10,
+  "timeoutSeconds": 5,
   "popularWordCount": 5,
   "profileOutputPath": "profileData.txt"
 }

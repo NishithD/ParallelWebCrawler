@@ -1,40 +1,20 @@
-Run at Mon, 1 Nov 2021 15:57:47 GMT
-com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 271ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 255ms
+Run at Tue, 2 Nov 2021 08:22:50 GMT
+com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 368ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 351ms
 
-Run at Mon, 1 Nov 2021 16:00:05 GMT
-com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 568ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 5s 739ms
+Run at Tue, 2 Nov 2021 08:23:01 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 419ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 4s 938ms
 
-Run at Mon, 1 Nov 2021 16:03:09 GMT
-com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 359ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 330ms
+Run at Tue, 2 Nov 2021 08:24:45 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 5s 236ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 17s 277ms
 
-Run at Mon, 1 Nov 2021 16:20:21 GMT
-com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 11s 446ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 1s 707ms
+Run at Tue, 2 Nov 2021 08:25:26 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 5s 487ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 17s 468ms
 
-Run at Mon, 1 Nov 2021 16:21:11 GMT
-com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 2s 699ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 4s 582ms
-
-Run at Mon, 1 Nov 2021 16:21:26 GMT
-com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 9s 681ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 1s 306ms
-
-Run at Mon, 1 Nov 2021 18:18:35 GMT
-com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 365ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 350ms
-
-Run at Mon, 1 Nov 2021 18:19:46 GMT
-com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 572ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 559ms
-
-Run at Mon, 1 Nov 2021 18:31:20 GMT
-com.udacity.webcrawler.SequentialWebCrawler#crawl took 0m 2s 664ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 2s 645ms
-
-Run at Mon, 1 Nov 2021 18:32:01 GMT
-com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 4s 15ms
-com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 7s 308ms
+Run at Tue, 2 Nov 2021 08:25:56 GMT
+com.udacity.webcrawler.ParallelWebCrawler#crawl took 0m 5s 290ms
+com.udacity.webcrawler.parser.PageParserImpl#parse took 0m 18s 270ms
 

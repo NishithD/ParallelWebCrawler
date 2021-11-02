@@ -127,11 +127,8 @@ public class CrawlerRecursiveAction extends RecursiveAction {
                 if (isVisited(url)) {
                     return;
                 }
-                synchronized (visitedUrls) {
-                    if (isVisited(url)) {
-                        return;
-                    }
-                    visitedUrls.add(url);
+                if (!visitedUrls.add(url)) {
+                    return;
                 }
                 PageParser.Result result = parserFactory.get(url).parse();
                 synchronized (counts) {

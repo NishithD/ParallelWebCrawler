@@ -37,7 +37,9 @@
 
 package com.udacity.webcrawler.profiler;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.Clock;
 import java.time.Duration;
@@ -63,18 +65,40 @@ final class ProfilingMethodInterceptor implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Object result;
-        Instant startTime = clock.instant();
-        try {
-            result = method.invoke(delegate, args);
-        } catch (Exception e) {
-            Instant endTime = clock.instant();
-            Duration duration = Duration.between(startTime, endTime);
-            state.record(delegate.getClass(), method, duration);
-            throw e.getCause();
+        if (isMethodProfiled(method)) {
+            Instant startTime = clock.instant();
+            try {
+                result = method.invoke(delegate, args);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
+            } finally {
+                Instant endTime = clock.instant();
+                Duration duration = Duration.between(startTime, endTime);
+                state.record(delegate.getClass(), method, duration);
+            }
+        } else {
+            try {
+                result = method.invoke(delegate, args);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException e) {
+                throw e.getTargetException();
+            }
         }
-        Instant endTime = clock.instant();
-        Duration duration = Duration.between(startTime, endTime);
-        state.record(delegate.getClass(), method, duration);
         return result;
+    }
+
+    private boolean isMethodProfiled(Method method) {
+        Annotation[] annotations = method.getAnnotations();
+        boolean isProfiled = false;
+        for (Annotation a : annotations) {
+            if (a instanceof Profiled) {
+                isProfiled = true;
+                break;
+            }
+        }
+        return isProfiled;
     }
 }

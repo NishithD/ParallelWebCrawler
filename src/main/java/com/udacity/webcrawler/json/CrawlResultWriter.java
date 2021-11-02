@@ -39,12 +39,15 @@ package com.udacity.webcrawler.json;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
+
+import static java.nio.file.StandardOpenOption.APPEND;
+import static java.nio.file.StandardOpenOption.CREATE;
 
 /**
  * Utility class to write a {@link CrawlResult} to file.
@@ -70,7 +73,7 @@ public final class CrawlResultWriter {
     public void write(Path path) {
         // This is here to get rid of the unused variable warning.
         Objects.requireNonNull(path);
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(String.valueOf(path)))) {
+        try (Writer bufferedWriter = Files.newBufferedWriter(path, StandardCharsets.UTF_8, CREATE, APPEND)) {
             write(bufferedWriter);
         } catch (IOException e) {
             e.printStackTrace();
