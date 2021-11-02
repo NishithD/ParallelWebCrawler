@@ -124,9 +124,6 @@ public class CrawlerRecursiveAction extends RecursiveAction {
                     return;
                 String url = startingUrls.get(0);
                 if (isUrlIgnored(url)) return;
-                if (isVisited(url)) {
-                    return;
-                }
                 if (!visitedUrls.add(url)) {
                     return;
                 }
