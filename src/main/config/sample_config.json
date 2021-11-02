@@ -3,8 +3,8 @@
   "ignoredUrls": ["https://blog.udacity.com/.*"],
   "ignoredWords": ["^.{1,3}$"],
   "parallelism": 4,
-  "maxDepth": 2,
-  "timeoutSeconds": 1,
+  "maxDepth": 10,
+  "timeoutSeconds": 10,
   "popularWordCount": 5,
   "profileOutputPath": "profileData.txt"
 }

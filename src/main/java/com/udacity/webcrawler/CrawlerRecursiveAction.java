@@ -41,6 +41,7 @@ import com.udacity.webcrawler.parser.PageParser;
 import com.udacity.webcrawler.parser.PageParserFactory;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ForkJoinTask;
@@ -52,6 +53,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private static final Set<String> visitedUrls = Collections.synchronizedSet(new HashSet<>());
     private final List<Pattern> ignoredUrls;
     private final Instant deadline;
+    private final Duration timeout;
     private final Clock clock;
     private final PageParserFactory parserFactory;
     private final List<String> startingUrls;
@@ -59,12 +61,14 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     private int maxDepth;
 
     private CrawlerRecursiveAction(Instant deadline,
+                                   Duration timeout,
                                    List<String> startingUrls,
                                    int maxDepth,
                                    Clock clock,
                                    List<Pattern> ignoredUrls,
                                    PageParserFactory parserFactory) {
         this.deadline = deadline;
+        this.timeout = timeout;
         this.startingUrls = startingUrls;
         this.toCrawlUrls = startingUrls;
         this.maxDepth = maxDepth;
@@ -75,6 +79,10 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
     public Instant getDeadline() {
         return deadline;
+    }
+
+    public Duration getTimeout() {
+        return timeout;
     }
 
     public List<String> getStartingUrls() {
@@ -107,12 +115,14 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
     @Override
     protected void compute() {
-        while (!toCrawlUrls.isEmpty()) {
-            if (isMaxDepthReached() || isTimeOut() || isStartEmpty()) return;
+        while (true) {
+            if (isTimeOut()) return;
             if (toCrawlUrls.size() > 1) {
                 ForkJoinTask.invokeAll(createSubtasks());
             } else {
-                String url = toCrawlUrls.get(0);
+                if (isMaxDepthReached() || isStartEmpty())
+                    return;
+                String url = startingUrls.get(0);
                 if (isUrlIgnored(url)) return;
                 if (isVisited(url)) {
                     return;
@@ -173,6 +183,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
                     .setStartingUrls(toCrawlUrls.subList(i, i + 1))
                     .setMaxDepth(maxDepth - 1)
                     .setClock(clock)
+                    .setTimeout(timeout)
                     .setIgnoredUrls(ignoredUrls)
                     .setParserFactory(parserFactory)
                     .build());
@@ -184,6 +195,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
     public static final class Builder {
         private List<Pattern> ignoredUrls;
         private Instant deadline;
+        private Duration timeout;
         private List<String> startingUrls;
         private int maxDepth;
         private Clock clock;
@@ -196,6 +208,11 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
         public Builder setDeadline(Instant deadline) {
             this.deadline = deadline;
+            return this;
+        }
+
+        public Builder setTimeout(Duration timeout) {
+            this.timeout = timeout;
             return this;
         }
 
@@ -220,7 +237,7 @@ public class CrawlerRecursiveAction extends RecursiveAction {
         }
 
         public CrawlerRecursiveAction build() {
-            return new CrawlerRecursiveAction(deadline, startingUrls, maxDepth, clock, ignoredUrls, parserFactory);
+            return new CrawlerRecursiveAction(deadline, timeout, startingUrls, maxDepth, clock, ignoredUrls, parserFactory);
         }
     }
 }

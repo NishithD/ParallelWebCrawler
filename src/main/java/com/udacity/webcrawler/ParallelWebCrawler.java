@@ -84,14 +84,15 @@ final class ParallelWebCrawler implements WebCrawler {
     @Override
     public CrawlResult crawl(List<String> startingUrls) {
         Instant deadline = clock.instant().plus(timeout);
-        CrawlerRecursiveAction crawlerRecursiveAction = new CrawlerRecursiveAction.Builder().
-                setDeadline(deadline).
-                setStartingUrls(startingUrls).
-                setMaxDepth(maxDepth).
-                setClock(clock).
-                setIgnoredUrls(ignoredUrls).
-                setParserFactory(parserFactory).
-                build();
+        CrawlerRecursiveAction crawlerRecursiveAction = new CrawlerRecursiveAction.Builder()
+                .setDeadline(deadline)
+                .setTimeout(timeout)
+                .setStartingUrls(startingUrls)
+                .setMaxDepth(maxDepth)
+                .setClock(clock)
+                .setIgnoredUrls(ignoredUrls)
+                .setParserFactory(parserFactory)
+                .build();
 
         pool.invoke(crawlerRecursiveAction);
         Map<String, Integer> counts = crawlerRecursiveAction.getCounts();
