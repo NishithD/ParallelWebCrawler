@@ -1,6 +1,6 @@
 # Parallel Web Crawler
 
-This is an parallel web crawler which can parse and return the most popular words on that website. It is developed and tested on Ubuntu 20.04 with Oracle JDK 14.0.2.
+This is a parallel web crawler which can parse and return the most popular words on that website. It is developed and tested on Ubuntu 20.04 with JDK 13.0.9.
 
 ## Cloning
 
