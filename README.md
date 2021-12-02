@@ -1,5 +1,7 @@
 # Parallel Web Crawler
 
+![CI](https://github.com/xichen-de/ParallelWebCrawler/actions/workflows/java-ci.yml/badge.svg)
+
 This is a parallel web crawler which can parse and return the most popular words on that website. It is developed and tested on Ubuntu 20.04 with JDK 13.0.9.
 
 ## Cloning
