@@ -1,17 +1,16 @@
 {
   "startPages": [
-    "https://www.udacity.com/"
+    "https://serializer.io/"
   ],
   "ignoredUrls": [
-    "https://blog.udacity.com/.*"
   ],
   "implementationOverride": "com.udacity.webcrawler.ParallelWebCrawler",
   "ignoredWords": [
-    "^.{1,3}$"
+    "^.{1,4}$"
   ],
   "parallelism": 4,
-  "maxDepth": 10,
-  "timeoutSeconds": 5,
+  "maxDepth": 5,
+  "timeoutSeconds": 10,
   "popularWordCount": 5,
   "profileOutputPath": "profileData.txt"
 }

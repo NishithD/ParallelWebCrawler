@@ -1,16 +1,23 @@
 # Parallel Web Crawler
 
+## Description
+
 ![CI](https://github.com/xichen-de/ParallelWebCrawler/actions/workflows/java-ci.yml/badge.svg)
 
-This is a parallel web crawler which can parse and return the most popular words on that website. It is developed and tested on Ubuntu 20.04 with JDK 13.0.9.
+This is a multi-threaded web crawler that can be used to crawl a website and extract all the links on the website. Then it analyzes the links until it reaches the depth limit. Finally, it calculates the most popular words on the website and saves the result in a file.
 
-## Cloning
+This project uses concurrency, dependency injection, unit testing and design patterns. It was developed and tested on Ubuntu 20.04.
+
+![image-20211102092705480](README.assets/example.png)
+
+## Usage    
+### Cloning
 
 ```
 git clone https://github.com/xichen-de/ParallelWebCrawler.git
 ```
 
-## Build and test
+### Build and test
 
 Use Maven to compile and run the unit tests:
 
@@ -19,20 +26,20 @@ mvn compile
 mvn test
 ```
 
-## Build JAR package
+### Build JAR package
 
 ```
 mvn package
 ```
 
-## Run on the real website
+### Run on the real website
 
 ```
 mvn package
 java -cp target/udacity-webcrawler-1.0.jar com.udacity.webcrawler.main.WebCrawlerMain src/main/config/example_config.json
 ```
 
-![image-20211102092705480](README.assets/example.png)
+
 
 ## Configuration
 
