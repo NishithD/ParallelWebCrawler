@@ -102,31 +102,27 @@ public class CrawlerRecursiveAction extends RecursiveAction {
 
     @Override
     protected void compute() {
-        while (true) {
-            if (isTimeOut()) return;
-            if (toCrawlUrls.size() > 1) {
-                ForkJoinTask.invokeAll(createSubtasks());
-            } else {
-                if (isMaxDepthReached() || isStartEmpty())
-                    return;
-                String url = startingUrls.get(0);
-                if (isUrlIgnored(url)) return;
-                if (!visitedUrls.add(url)) {
-                    return;
-                }
-                PageParser.Result result = parserFactory.get(url).parse();
-                synchronized (counts) {
-                    for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
-                        counts.put(e.getKey(), counts.containsKey(e.getKey())
-                                ? counts.get(e.getKey()) + e.getValue()
-                                : e.getValue());
-                    }
+        while (!isTimeOut() && toCrawlUrls.size() > 1) {
+            ForkJoinTask.invokeAll(createSubtasks());
+        }
 
-                }
-                toCrawlUrls = result.getLinks();
-                maxDepth -= 1;
+        if (isMaxDepthReached() || isStartEmpty() || isUrlIgnored(startingUrls.get(0)))
+            return;
+
+        String url = startingUrls.get(0);
+        if (!visitedUrls.add(url)) return;
+
+        PageParser.Result result = parserFactory.get(url).parse();
+        synchronized (counts) {
+            for (Map.Entry<String, Integer> e : result.getWordCounts().entrySet()) {
+                counts.put(e.getKey(), counts.containsKey(e.getKey())
+                        ? counts.get(e.getKey()) + e.getValue()
+                        : e.getValue());
             }
         }
+
+        toCrawlUrls = result.getLinks();
+        maxDepth -= 1;
     }
 
     private boolean isUrlIgnored(String url) {

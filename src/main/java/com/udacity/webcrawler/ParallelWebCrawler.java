@@ -84,19 +84,16 @@ final class ParallelWebCrawler implements WebCrawler {
         pool.invoke(crawlerRecursiveAction);
         Map<String, Integer> counts = crawlerRecursiveAction.getCounts();
         Set<String> visitedUrls = crawlerRecursiveAction.getVisitedUrls();
-        if (counts.isEmpty()) {
 
+        CrawlResult.Builder resultBuilder = new CrawlResult.Builder()
+                .setWordCounts(counts)
+                .setUrlsVisited(visitedUrls.size());
 
-            return new CrawlResult.Builder()
-                    .setWordCounts(counts)
-                    .setUrlsVisited(visitedUrls.size())
-                    .build();
+        if (!counts.isEmpty()) {
+            resultBuilder.setWordCounts(WordCounts.sort(counts, popularWordCount));
         }
 
-        return new CrawlResult.Builder()
-                .setWordCounts(WordCounts.sort(counts, popularWordCount))
-                .setUrlsVisited(visitedUrls.size())
-                .build();
+        return resultBuilder.build();
     }
 
     @Override
